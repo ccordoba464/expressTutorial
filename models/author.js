@@ -27,5 +27,27 @@ AuthorSchema.virtual("url").get(function () {
   return `/catalog/author/${this._id}`;
 });
 
+// Calculate the lifespan in years
+AuthorSchema.virtual("lifespan").get(function () {
+  if (this.date_of_birth) {
+    const birthDate = this.date_of_birth;
+    let deathDate = this.date_of_death;
+
+    if (!deathDate) {
+      // If there's no death date, use the current date as the death date
+      deathDate = new Date();
+    }
+
+    const timeDifferenceMs = deathDate - birthDate;
+    const millisecondsInYear = 31536000000; // Approximate number of milliseconds in a year
+
+    const years = Math.round(timeDifferenceMs / millisecondsInYear);
+
+    return years;
+  }
+
+  return 0; // If birthDate is not available, return 0.
+});
+
 // Export model
 module.exports = mongoose.model("Author", AuthorSchema);
